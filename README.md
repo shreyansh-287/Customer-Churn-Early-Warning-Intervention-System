@@ -1,357 +1,230 @@
 # Customer Churn Early Warning & Intervention System
 
-## 1. Project Overview
+## Project Overview
 
-This project is an end-to-end **Data Engineering + Machine Learning + Apache Airflow** pipeline designed to proactively identify customers at risk of churn and recommend business actions to retain them.
+This project is an end-to-end **Customer Churn Early Warning System** built to help businesses identify customers who are likely to stop using their services and take proactive action to retain them.
 
-It simulates a real-world **subscription-based business use case** where customer data is continuously analyzed to prevent revenue loss.
+In subscription-based businesses (telecom, SaaS, OTT, fintech, etc.), customer churn directly impacts revenue. Waiting until a customer leaves is costly and ineffective. This system focuses on **predicting churn before it happens** and enabling **timely intervention**.
 
-The system:
-- Collects customer data
-- Builds monthly feature snapshots
-- Trains a churn prediction model
-- Predicts churn probability
-- Categorizes customers into risk buckets
-- Generates business recommendations
-- Is fully automated using Apache Airflow
+The entire pipeline is automated and runs on a monthly basis.
 
 ---
 
-## 2. Business Problem Statement
+## Business Problem
 
-Customer churn directly impacts revenue and growth. Most companies react **after churn happens**, which is too late.
+Customer churn is one of the biggest challenges for any subscription-based business.  
+Losing customers means:
+- Loss of recurring revenue  
+- Increased acquisition costs  
+- Reduced customer lifetime value  
 
-### Business Goal:
-To create an **early warning system** that:
-- Identifies customers likely to churn
-- Quantifies churn risk
-- Enables proactive retention strategies
-
-### Business Value:
-- Reduce revenue loss
-- Improve customer lifetime value
-- Enable targeted retention campaigns
-- Support data-driven decision making
+Most businesses react after the customer has already churned. This project is designed to **shift from reactive to proactive retention**.
 
 ---
 
-## 3. What Are We Trying To Achieve?
+## Business Objective
 
-For every customer, every month, we want to answer:
-- Is this customer likely to churn?
-- How risky is this customer? (Low / Medium / High)
-- What action should the business take?
+The goal of this project is to:
 
-This allows:
-- Retention teams to intervene early
-- Marketing teams to target campaigns
-- Support teams to prioritize high-risk users
+- Continuously monitor customer behavior  
+- Identify early signs of churn  
+- Predict churn risk for each customer  
+- Categorize customers into risk levels  
+- Recommend appropriate business actions  
 
----
-
-## 4. High Level Architecture
-
-PostgreSQL (Raw Tables)
-        |
-        v
-Feature Engineering (SQL + Python)
-        |
-        v
-ML Model Training (Scikit-learn)
-        |
-        v
-Churn Prediction
-        |
-        v
-Recommendation Engine
-        |
-        v
-PostgreSQL (Risk + Recommendations Tables)
-        |
-        v
-Apache Airflow Orchestration
+So that business teams can:
+- Engage high-risk customers early  
+- Offer discounts, support, or incentives  
+- Reduce churn and increase retention  
 
 ---
 
-## 5. Technology Stack
+## What This Project Does
 
-- Python
-- PostgreSQL
-- Apache Airflow
-- Scikit-learn
-- Pandas
-- SQLAlchemy
-- Joblib
+Every month, the system automatically:
 
----
+1. **Collects customer data**  
+   - Profile information  
+   - Subscription details  
+   - Product usage behavior  
+   - Payment history  
 
-## 6. Database Tables & Meaning
+2. **Builds a monthly feature snapshot**  
+   - Tenure  
+   - Average spend  
+   - Usage frequency  
+   - Support interactions  
+   - Failed payments  
 
-### 6.1 churn.customers
-Stores customer demographic and profile data.
+3. **Trains a churn prediction model** using historical data  
 
-Purpose: Identify who the customer is.
+4. **Predicts churn probability** for each customer  
 
-Columns:
-- customer_id: Unique identifier
-- gender: Customer gender
-- age: Customer age
-- geography: Region or country
-- signup_date: When customer joined
-- contract_type: Monthly/Quarterly/Annual
-- payment_method: Mode of payment
-- is_active: Whether customer is active
+5. **Assigns a risk category**  
+   - Low Risk  
+   - Medium Risk  
+   - High Risk  
 
----
+6. **Generates business recommendations** such as:
+   - No action needed  
+   - Send engagement email / discount  
+   - Immediate retention call  
 
-### 6.2 churn.subscriptions
-Stores subscription plan information.
-
-Purpose: Understand what plan the customer is on.
-
-Columns:
-- subscription_id
-- customer_id
-- plan_type
-- monthly_charges
-- start_date
-- end_date
-- status
+All results are stored in the database for reporting and action.
 
 ---
 
-### 6.3 churn.usage_events
-Tracks how customers use the product.
+## Business Use Case Example
 
-Purpose: Behavioral analysis.
+For a telecom or SaaS company:
 
-Columns:
-- usage_id
-- customer_id
-- event_date
-- sessions_count
-- avg_session_time
-- support_tickets
+- A customer with declining usage, multiple support tickets, and failed payments is flagged as **High Risk**
+- The system recommends **immediate retention action**
+- The retention team contacts the customer with an offer or support
+- Churn is prevented before it happens
 
-This data is extremely important for churn prediction.
-
----
-
-### 6.4 churn.payments
-Tracks payment history.
-
-Purpose: Identify failed payments and revenue patterns.
-
-Columns:
-- payment_id
-- customer_id
-- payment_date
-- amount
-- payment_status
-- payment_method
-
-Failed payments are a strong churn signal.
+This directly impacts:
+- Revenue protection  
+- Customer satisfaction  
+- Long-term business growth  
 
 ---
 
-### 6.5 churn.customer_feature_snapshots (Auto Generated)
+## Key Outputs of the System
 
-Purpose: Monthly aggregated feature table used for ML.
+The system produces two critical business tables:
 
-Features include:
-- Tenure in months
-- Average monthly spend
-- Total sessions
-- Average session time
-- Support ticket count
-- Failed payment count
+### 1. Churn Risk History
+Contains:
+- Customer ID  
+- Month  
+- Churn probability  
+- Risk category (Low / Medium / High)  
 
-This is the **ML-ready feature table**.
-
----
-
-### 6.6 churn.churn_risk_history (Auto Generated)
-
-Purpose: Store churn predictions.
-
-Columns:
-- snapshot_month
-- customer_id
-- churn_probability
-- risk_bucket
+This helps business teams understand:
+- Who is at risk
+- How risk is changing over time
 
 ---
 
-### 6.7 churn.churn_recommendations (Auto Generated)
+### 2. Churn Recommendations
+Contains:
+- Customer ID  
+- Risk category  
+- Recommended business action  
 
-Purpose: Store business actions.
-
-Columns:
-- snapshot_month
-- customer_id
-- risk_bucket
-- recommended_action
-
----
-
-## 7. Feature Engineering Logic
-
-We calculate:
-- Tenure = months since signup
-- Avg monthly spend = average payments
-- Total sessions = sum of sessions
-- Avg session time = average usage duration
-- Support ticket count = number of tickets
-- Failed payment count = payment_status = 'Failed'
-
-These features are industry-standard churn indicators.
+This table is directly usable by:
+- Retention teams  
+- Marketing teams  
+- Customer support teams  
 
 ---
 
-## 8. Machine Learning Model
+## Why This Project Matters
 
-Model Used: **Random Forest Classifier**
+This project demonstrates how data engineering and machine learning can be combined to solve a **real business problem**.
 
-Why Random Forest:
-- Handles non-linear relationships
-- Works well with mixed data types
-- Robust to noise
-- Minimal preprocessing required
-- Excellent baseline model for churn problems
-
----
-
-## 9. Risk Buckets
-
-Based on churn probability:
-- 0.0 – 0.4 → Low Risk
-- 0.4 – 0.7 → Medium Risk
-- 0.7 – 1.0 → High Risk
+It shows:
+- How raw customer data can be transformed into insights  
+- How machine learning can drive business decisions  
+- How automation can replace manual analysis  
+- How businesses can become proactive instead of reactive  
 
 ---
 
-## 10. Recommendation Logic
+## Tech Stack Used
 
-Business rules:
-
-- Low Risk → "No action needed"
-- Medium Risk → "Send discount or engagement email"
-- High Risk → "Immediate retention call and offer"
-
----
-
-## 11. Apache Airflow Pipeline
-
-DAG Name: **churn_early_warning_pipeline**
-
-Schedule: Monthly
-
-Task Flow:
-
-build_feature_snapshot  
-↓  
-train_churn_model  
-↓  
-predict_churn  
-↓  
-generate_recommendations  
-
-Each task is a PythonOperator calling project functions.
+- **Python** – Data processing and machine learning  
+- **PostgreSQL** – Data storage and analytics  
+- **Apache Airflow** – Workflow orchestration and automation  
+- **Pandas** – Data manipulation  
+- **Scikit-learn** – Machine learning model  
+- **SQLAlchemy** – Database connectivity  
 
 ---
 
-## 12. Airflow Concepts Used
-
-- DAG: Defines workflow
-- PythonOperator: Runs Python functions
-- op_kwargs / op_args: Pass execution date
-- Scheduler: Triggers tasks
-- Webserver: UI
-- DagBag: Loads DAGs
-- TaskInstance: Execution of each task
 
 ---
 
-## 13. Major Airflow Commands Used
+## Architecture Explanation (Step-by-Step)
 
-Setup:
-- airflow db init
-- airflow users create
-- airflow webserver -D
-- airflow scheduler -D
+### 1. Data Layer (PostgreSQL)
 
-Debugging:
-- airflow dags list
-- airflow dags list-import-errors
-- airflow tasks clear <dag_id>
-- airflow config get-value core dags_folder
-- pkill -f airflow
+This is where all raw business data lives:
+- Customer profile data  
+- Subscription details  
+- Usage events  
+- Payment records  
+
+This simulates a real production database in a company.
 
 ---
 
-## 14. Major Challenges Faced & Solutions
+### 2. Feature Engineering Layer
 
-### Challenge 1: DAG Not Appearing
-Cause: Wrong dags_folder path  
-Solution: Set AIRFLOW__CORE__DAGS_FOLDER correctly
+A monthly snapshot is built using SQL logic to convert raw data into meaningful features such as:
+- Tenure in months  
+- Average monthly spend  
+- Total sessions  
+- Average session time  
+- Number of support tickets  
+- Failed payment count  
 
----
-
-### Challenge 2: Import Errors in DAG
-Cause: Python path issues  
-Solution: Dynamically added src/ to sys.path
-
----
-
-### Challenge 3: SQL Syntax Errors (:, % issues)
-Cause: Mixing SQLAlchemy and psycopg2 syntax  
-Solution: Standardized on SQLAlchemy text() + parameters
+This creates a **clean, ML-ready dataset**.
 
 ---
 
-### Challenge 4: Pandas + SQLAlchemy Conflicts
-Cause: Passing engine instead of connection  
-Solution: Used engine.begin() and raw execution
+### 3. Machine Learning Layer
+
+A churn prediction model is trained using historical feature data.
+
+The model learns patterns such as:
+- Low usage + high support tickets = higher churn risk  
+- Failed payments + short tenure = higher churn risk  
+
+The trained model is saved and reused for prediction.
 
 ---
 
-### Challenge 5: Feature Mismatch in ML
-Cause: Different features at train vs predict  
-Solution: Aligned feature engineering logic
+### 4. Prediction Layer
+
+For each monthly snapshot:
+- The model predicts **churn probability** for every customer  
+- Each customer is classified into:
+  - Low Risk  
+  - Medium Risk  
+  - High Risk  
+
+This converts data into **actionable insight**.
 
 ---
 
-### Challenge 6: Table Not Found Errors
-Cause: Table not created before insert  
-Solution: Explicitly created all tables
+### 5. Recommendation Layer
+
+Based on risk category, business actions are generated:
+
+| Risk Level | Recommended Action |
+|-----------|---------------------|
+| Low       | No action needed    |
+| Medium    | Send offer / email  |
+| High      | Immediate retention call |
+
+This makes the system **business-usable**, not just analytical.
 
 ---
 
-### Challenge 7: Model Save Path Error
-Cause: models/ folder did not exist  
-Solution: Created directory before saving model
+### 6. Orchestration Layer (Airflow)
+
+Apache Airflow automates the entire pipeline:
 
 ---
 
-## 15. What This Project Demonstrates
+## Summary
 
-- Data modeling
-- Feature engineering
-- Machine learning integration
-- Airflow orchestration
-- Business thinking
-- Production-style pipeline design
+This project is a complete **business-focused churn prediction and intervention system** that:
+- Identifies customers at risk
+- Quantifies churn probability
+- Suggests actions to retain customers
+- Runs automatically on a schedule
 
----
-
-## 16. How To Explain This Project In Interviews
-
-"I built an end-to-end churn prediction system using PostgreSQL, Python, and Apache Airflow.  
-The pipeline builds monthly customer features, trains a machine learning model, predicts churn probability, categorizes customers into risk buckets, and generates business recommendations automatically."
-
----
-
-## 17. Author
-
-Shreyansh Pathak  
-AI / Data Analyst | Data Engineering | ML Systems
+It is designed to reflect how churn prevention systems are built and used in real companies.
