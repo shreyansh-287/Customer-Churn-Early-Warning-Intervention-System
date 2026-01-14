@@ -55,7 +55,7 @@ So that business teams can:
 ---
 
 ## 🏗️ Architecture
-"""
+```
 PostgreSQL (customers, subscriptions, usage, payments)
 ↓
 SQL Feature Engineering (monthly snapshots)
@@ -66,12 +66,13 @@ Risk Classification (Low / Medium / High)
 ↓
 Recommendation Engine (business actions)
 ↓
-Apache Airflow (monthly orchestration)"""
-
+Apache Airflow (monthly orchestration)
+```
 ---
 
 ## 📁 Project Structure
 
+```
 Customer-Churn-Early-Warning-Intervention-System/
 │
 ├── dags/
@@ -88,6 +89,7 @@ Customer-Churn-Early-Warning-Intervention-System/
 │   └── churn_model.pkl
 │
 └── README.md
+```
 
 ---
 
