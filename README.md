@@ -158,6 +158,8 @@ This is where all raw business data lives:
 
 This simulates a real production database in a company.
 
+<img width="3420" height="2144" alt="image" src="https://github.com/user-attachments/assets/f5dc27d4-c287-4be5-9533-6d33f7d69001" />
+
 ---
 
 ### 2. Feature Engineering Layer
@@ -216,6 +218,8 @@ This makes the system **business-usable**, not just analytical.
 ### 6. Orchestration Layer (Airflow)
 
 Apache Airflow automates the entire pipeline:
+
+<img width="3420" height="1898" alt="image" src="https://github.com/user-attachments/assets/e68b5828-70ec-48b7-b2ff-c51d4f7120b0" />
 
 ---
 
