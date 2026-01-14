@@ -1,4 +1,4 @@
-# 📉 Customer Churn Early Warning & Intervention System
+# 📉 Early Warning & Intervention System
 
 An end-to-end, production-style **customer churn prediction and intervention pipeline** built using **PostgreSQL, Python, Machine Learning, and Apache Airflow**.  
 This project demonstrates realistic data modeling, SQL-based feature engineering, ML training, scheduled orchestration, and business-driven recommendations.
