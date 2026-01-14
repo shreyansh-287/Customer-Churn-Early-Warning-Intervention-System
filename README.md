@@ -55,7 +55,7 @@ So that business teams can:
 ---
 
 ## 🏗️ Architecture
-
+"""
 PostgreSQL (customers, subscriptions, usage, payments)
 ↓
 SQL Feature Engineering (monthly snapshots)
@@ -66,7 +66,7 @@ Risk Classification (Low / Medium / High)
 ↓
 Recommendation Engine (business actions)
 ↓
-Apache Airflow (monthly orchestration)
+Apache Airflow (monthly orchestration)"""
 
 ---
 
@@ -75,20 +75,19 @@ Apache Airflow (monthly orchestration)
 Customer-Churn-Early-Warning-Intervention-System/
 │
 ├── dags/
-│ └── churn_ml_pipeline_dag.py # Airflow DAG
+│   └── churn_ml_pipeline_dag.py
 │
 ├── src/
-│ ├── db.py # DB connection
-│ ├── snapshot_builder.py # Feature snapshot logic
-│ ├── train_model.py # ML training
-│ ├── predict_churn.py # Churn prediction
-│ └── recommend_actions.py # Recommendation logic
+│   ├── db.py
+│   ├── snapshot_builder.py
+│   ├── train_model.py
+│   ├── predict_churn.py
+│   └── recommend_actions.py
 │
 ├── models/
-│ └── churn_model.pkl # Trained model
+│   └── churn_model.pkl
 │
 └── README.md
-
 
 ---
 
